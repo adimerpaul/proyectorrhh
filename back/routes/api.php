@@ -18,3 +18,4 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 Route::apiResource('/persona',\App\Http\Controllers\PersonaController::class);
+Route::post('/upload',[\App\Http\Controllers\PersonaController::class,'upload']);

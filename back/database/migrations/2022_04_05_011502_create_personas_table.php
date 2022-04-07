@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer("sueldo");
             $table->string("foto");
             $table->date('fecharegistro');
+            $table->date('fechafin');
             $table->timestamps();
         });
     }

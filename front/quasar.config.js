@@ -76,6 +76,11 @@ module.exports = configure(function (ctx) {
       chainWebpack (chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js', 'vue' ] }])
+      },
+      env: {
+        API: ctx.dev
+          ? 'http://localhost:8000/api/'
+          : 'https://prod.api.com'
       }
 
     },

@@ -23,6 +23,7 @@ class PersonaFactory extends Factory
             "ci"=>$this->faker->numberBetween(7330000,7340000),
             "cargo"=>$this->faker->name(),
             "foto"=>"",
+            "fechafin"=>"2023-01-01",
             "sueldo"=>$this->faker->numberBetween(2000,15000),
             "fecharegistro"=>now(),
         ];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Persona;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
+use Illuminate\Http\Request;
 
 
 class PersonaController extends Controller
@@ -17,6 +18,19 @@ class PersonaController extends Controller
     public function index()
     {
         return Persona::all();
+    }
+    public function upload(Request $request){
+        if ($request->hasFile('imagen')){
+            $file=$request->file('imagen');
+            $nombre=time().'.'.$file->getClientOriginalExtension();
+            $file->move(\public_path('imagenes'),$nombre);
+            $persona=Persona::find($request->persona_id);
+            $persona->foto=$nombre;
+            $persona->save();
+            return $nombre;
+        }else{
+            return "no existe la imagen";
+        }
     }
 
     /**

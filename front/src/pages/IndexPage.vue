@@ -20,7 +20,8 @@
               <q-input dense outlined type="number" label="sueldo" v-model="persona.sueldo" />
             </div>
             <div class="col-3">
-              <q-input dense outlined label="cargo" v-model="persona.cargo" />
+<!--              <q-input dense outlined label="cargo" v-model="persona.cargo" />-->
+              <q-select outlined dense :options="cargos" v-model="cargo"></q-select>
             </div>
             <div class="col-3 flex flex-center">
               <q-btn type="submit" color="positive" icon="send" label="registrar"/>
@@ -33,8 +34,15 @@
           <template v-slot:body-cell-opciones="props">
             <q-td :props="props">
 <!--              {{props.row.id}}-->
-              <q-btn size="xs" @click="frmupdatepersona(props.row)" flat icon="edit" color="warning"/>
-              <q-btn size="xs" @click="deletepersona(props.row.id)" flat icon="delete" color="negative"/>
+              <q-btn size="xs" @click="frmupdatepersona(props.row)" label="modificar" icon="edit" color="warning"/>
+              <q-btn size="xs" @click="subirimagen(props.row)" label="imagen" icon="photo" color="info"/>
+              <q-btn size="xs" @click="deletepersona(props.row.id)" label="eliminar" icon="delete" color="negative"/>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-foto="props">
+            <q-td :props="props">
+              <q-img width="200" v-if="props.row.foto!=''" :src="url+'../imagenes/'+props.row.foto"/>
+<!--              {{ url + '../' + props.row.foto }}-->
             </q-td>
           </template>
           <template v-slot:top-right>
@@ -47,6 +55,21 @@
         </q-table>
       </div>
     </div>
+    <q-dialog v-model="modalphoto">
+      <q-card style="width: 400px;max-width: 40vw">
+        <q-card-section class="text-h6">Subir imagen</q-card-section>
+        <q-card-section class="q-pt-none">
+          <q-uploader
+            class="full-width"
+            label="Subir imagen"
+            :factory="uploadFile"
+          />
+        </q-card-section>
+        <q-card-actions align="right" class="bg-white text-teal">
+          <q-btn flat label="OK" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-dialog
       v-model="medium"
     >
@@ -74,7 +97,8 @@
                 <q-input dense outlined type="number" label="sueldo" v-model="persona2.sueldo" />
               </div>
               <div class="col-6">
-                <q-input dense outlined label="cargo" v-model="persona2.cargo" />
+<!--                <q-input dense outlined label="cargo" v-model="persona2.cargo" />-->
+                <q-select outlined dense :options="cargos" v-model="cargo"></q-select>
               </div>
               <div class="col-12 flex flex-center">
                 <q-btn class="full-width" type="submit" color="warning" icon="edit" label="modificar"/>
@@ -95,12 +119,22 @@
 export default {
   data(){
     return{
+      url:process.env.API,
+      modalphoto:false,
       medium:false,
       filter:'',
+      cargos:[
+        {label:'TECNICO'},
+        {label:'INGENIERO'},
+        {label:'PROFECIONA'},
+        {label:'INFORMATICO'},
+      ],
+      cargo:{label:'TECNICO'},
       columns:[
-        {name:"paterno",field:"paterno",label:"paterno"},
-        {name:"materno",field:"materno",label:"materno"},
-        {name:"nombres",field:"nombres",label:"nombres"},
+        // {name:"paterno",field:"paterno",label:"paterno"},
+        // {name:"materno",field:"materno",label:"materno"},
+        {name:"nombre",field:"nombre",label:"nombre"},
+        {name:"foto",field:"foto",label:"foto"},
         {name:"cargo",field:"cargo",label:"cargo"},
         {name:"opciones",field:"opciones",label:"opciones"},
       ],
@@ -113,13 +147,31 @@ export default {
     this.mispersonas()
   },
   methods:{
+    uploadFile(files){
+      this.$q.loading.show()
+      const fileData= new FormData()
+      fileData.append('imagen',files[0])
+      fileData.append('persona_id',this.persona2.id)
+      this.$api.post('upload',fileData)
+      .then(res=>{
+        console.log(res.data)
+        this.modalphoto=false
+        this.mispersonas()
+      })
+    },
     frmupdatepersona(persona){
       this.persona2=persona
+      this.cargo={label: this.persona2.cargo}
       this.medium=true
+    },
+    subirimagen(persona){
+      this.persona2=persona
+      this.modalphoto=true
     },
     createpersona(){
       this.$q.loading.show()
-      this.$api.post('http://localhost:8000/api/persona',this.persona)
+      this.persona.cargo=this.cargo.label
+      this.$api.post('persona',this.persona)
       .then(res=>{
         this.mispersonas()
         this.persona={}
@@ -128,7 +180,8 @@ export default {
     },
     updatepersona(){
       this.$q.loading.show()
-      this.$api.put('http://localhost:8000/api/persona/'+this.persona2.id,this.persona2)
+      this.persona2.cargo=this.cargo.label
+      this.$api.put('persona/'+this.persona2.id,this.persona2)
         .then(res=>{
           // this.$q.loading.hide()
           this.mispersonas()
@@ -140,7 +193,7 @@ export default {
     deletepersona(id){
       if (confirm("Seguro de elimnar?")){
         this.$q.loading.show()
-        this.$api.delete('http://localhost:8000/api/persona/'+id)
+        this.$api.delete('persona/'+id)
           .then(res=>{
             // this.$q.loading.hide()
             this.mispersonas()
@@ -152,10 +205,16 @@ export default {
     },
     mispersonas(){
       this.$q.loading.show()
-      this.$api.get('http://localhost:8000/api/persona')
+      this.$api.get('persona')
         .then(res=>{
+          this.personas=[]
+          res.data.forEach(r=>{
+            let d=r
+            d.nombre=r.paterno+' '+r.materno+' '+r.nombres
+            this.personas.push(d)
+          })
           this.$q.loading.hide()
-          this.personas=res.data
+
         })
     }
   }
