@@ -59,6 +59,7 @@ class PersonaController extends Controller
         $persona->cargo=$request->cargo;
         $persona->foto='';
         $persona->sueldo=$request->sueldo;
+        $persona->fechafin=$request->fechafin;
         $persona->fecharegistro=date('Y-m-d');
         $persona->save();
         return $persona;
@@ -101,6 +102,7 @@ class PersonaController extends Controller
         $persona->ci=$request->ci;
         $persona->cargo=$request->cargo;
         $persona->sueldo=$request->sueldo;
+        $persona->fechafin=$request->fechafin;
         $persona->save();
         return $persona;
     }

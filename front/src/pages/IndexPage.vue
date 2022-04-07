@@ -23,6 +23,9 @@
 <!--              <q-input dense outlined label="cargo" v-model="persona.cargo" />-->
               <q-select outlined dense :options="cargos" v-model="cargo"></q-select>
             </div>
+            <div class="col-3">
+              <q-input dense outlined type="date" label="sueldo" v-model="persona.fechafin" />
+            </div>
             <div class="col-3 flex flex-center">
               <q-btn type="submit" color="positive" icon="send" label="registrar"/>
             </div>
@@ -34,9 +37,11 @@
           <template v-slot:body-cell-opciones="props">
             <q-td :props="props">
 <!--              {{props.row.id}}-->
+              <q-btn size="xs" @click="imprimircre(props.row)" label="credencial" icon="print" color="accent"/>
               <q-btn size="xs" @click="frmupdatepersona(props.row)" label="modificar" icon="edit" color="warning"/>
               <q-btn size="xs" @click="subirimagen(props.row)" label="imagen" icon="photo" color="info"/>
               <q-btn size="xs" @click="deletepersona(props.row.id)" label="eliminar" icon="delete" color="negative"/>
+
             </q-td>
           </template>
           <template v-slot:body-cell-foto="props">
@@ -100,6 +105,9 @@
 <!--                <q-input dense outlined label="cargo" v-model="persona2.cargo" />-->
                 <q-select outlined dense :options="cargos" v-model="cargo"></q-select>
               </div>
+              <div class="col-6">
+                <q-input dense outlined type="date" label="sueldo" v-model="persona2.fechafin" />
+              </div>
               <div class="col-12 flex flex-center">
                 <q-btn class="full-width" type="submit" color="warning" icon="edit" label="modificar"/>
               </div>
@@ -116,6 +124,9 @@
 </template>
 
 <script>
+import {date} from "quasar";
+import { jsPDF } from "jspdf";
+
 export default {
   data(){
     return{
@@ -126,7 +137,7 @@ export default {
       cargos:[
         {label:'TECNICO'},
         {label:'INGENIERO'},
-        {label:'PROFECIONA'},
+        {label:'PROFECIONAL'},
         {label:'INFORMATICO'},
       ],
       cargo:{label:'TECNICO'},
@@ -138,15 +149,37 @@ export default {
         {name:"cargo",field:"cargo",label:"cargo"},
         {name:"opciones",field:"opciones",label:"opciones"},
       ],
-      persona:{},
+      persona:{fechafin:date.formatDate(new Date(),'YYYY-MM-DD')},
       persona2:{},
       personas:[]
     }
   },
   created() {
     this.mispersonas()
+
   },
   methods:{
+    imprimircre(persona){
+      const doc = new jsPDF()
+      doc.setFontSize(10)
+      var img= new Image()
+      img.src="plantilla.jpg"
+      doc.addImage(img,'jpg',1,1,150,150)
+      var imgfoto= new Image()
+      imgfoto.src=this.url+'../imagenes/'+persona.foto
+
+
+        // doc.addImage(imgfoto,'jpg',1,1,50,50)
+        // doc.text("Hello world!", 10, 10);
+        doc.text(persona.paterno, 67, 87)
+        doc.text(persona.materno, 67, 93)
+        doc.text(persona.nombres, 67, 99)
+        doc.text(persona.fechafin, 67, 104)
+        // doc.save("a4.pdf");
+        window.open(doc.output('bloburl'), '_blank')
+
+
+    },
     uploadFile(files){
       this.$q.loading.show()
       const fileData= new FormData()
