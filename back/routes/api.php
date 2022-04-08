@@ -17,6 +17,12 @@ use Illuminate\Support\Facades\Route;
 //Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
-Route::apiResource('/persona',\App\Http\Controllers\PersonaController::class);
-Route::post('/upload',[\App\Http\Controllers\PersonaController::class,'upload']);
-Route::post('/base64',[\App\Http\Controllers\PersonaController::class,'base64']);
+Route::post('/login',[\App\Http\Controllers\UserController::class,'login']);
+
+Route::group(['middleware'=>'auth:sanctum'],function (){
+    Route::post('/logout',[\App\Http\Controllers\UserController::class,'logout']);
+    Route::apiResource('/persona',\App\Http\Controllers\PersonaController::class);
+    Route::post('/upload',[\App\Http\Controllers\PersonaController::class,'upload']);
+    Route::post('/base64',[\App\Http\Controllers\PersonaController::class,'base64']);
+});
+

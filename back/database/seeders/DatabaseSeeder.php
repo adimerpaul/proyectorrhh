@@ -17,5 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         Persona::factory(1100)->create();
+        $this->call([
+           UserSeeder::class
+        ]);
     }
 }

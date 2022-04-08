@@ -271,8 +271,10 @@ export default {
             this.personas.push(d)
           })
           this.$q.loading.hide()
-
-        })
+        }).catch(err=>{
+        this.$q.loading.hide()
+          console.log(err)
+      })
     }
   }
 }
