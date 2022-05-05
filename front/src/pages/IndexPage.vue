@@ -24,7 +24,7 @@
               <q-select outlined dense :options="cargos" v-model="cargo"></q-select>
             </div>
             <div class="col-3">
-              <q-input dense outlined type="date" label="sueldo" v-model="persona.fechafin" />
+              <q-input dense outlined type="date" label="Fecha fin" v-model="persona.fechafin" />
             </div>
             <div class="col-3 flex flex-center">
               <q-btn type="submit" color="positive" icon="send" label="registrar"/>
